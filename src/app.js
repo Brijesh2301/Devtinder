@@ -4,13 +4,33 @@ const express = require('express');
 
 const app = express();
 
-app.use('/test', (req, res) => {
-    res.send("Hello from th");
+
+app.get(/^\/ab+c$/, (req, res) => {
+  res.send({ firstName: "Durgesh", lastName: "Kushwaha" });
 });
 
-app.use('/hello', (req,res)=>{
-    res.send("Hello from ther dashboard ")
+
+
+//This will only handle GET call to /user
+app.get('/user' ,(req,res) =>  {
+    res.send({firstName: "Brijesh", lastName: "Kushwaha"})
+});
+
+//savig data into the database
+
+app.post('/user', (req,res)=>{
+    console.log("save data to the database ");
+    res.send("Data sucessfully saved in the database ")
 })
+
+app.delete('/user', (req,res)=>{
+  
+    res.send("Delete the user ")
+})
+
+
+
+
 
 
 app.listen(3000, ()=>{
