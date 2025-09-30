@@ -1,38 +1,43 @@
-//creating the server
-
-const express = require('express');
-
+// server.js
+const express = require("express");
 const app = express();
 
 
-app.get(/^\/ab+c$/, (req, res) => {
-  res.send({ firstName: "Durgesh", lastName: "Kushwaha" });
-});
+const PORT = 3000;
 
+const {adminAuth, userAuth } = require("./middlewares/auth");
 
+//Handle Auth Middlware for all GET POST ... requests
 
-//This will only handle GET call to /user
-app.get('/user' ,(req,res) =>  {
-    res.send({firstName: "Brijesh", lastName: "Kushwaha"})
-});
+app.use('/admin',adminAuth)
 
-//savig data into the database
-
-app.post('/user', (req,res)=>{
-    console.log("save data to the database ");
-    res.send("Data sucessfully saved in the database ")
+app.post("/user/login", (req, res)=>{
+    res.send("User Log Sucessfully ")
 })
 
-app.delete('/user', (req,res)=>{
+app.get("./user", userAuth, (req,res)=>{
+    res.send("User Data sent")
+})
+// user route
+app.get("/user", (req, res)=>{
+  res.send("User Data sent");  
+});
+
+// admin getAllData route
+app.get("/admin/getAllData", (req, res)=>{
+   
+        res.send("All data sent");
+    }
+   
+);
+
+// admin deleteUser route
+app.get("/admin/deleteUser" , (req,res)=>{
   
-    res.send("Delete the user ")
-})
+        res.send("Delete a user");
+    }
+);
 
-
-
-
-
-
-app.listen(3000, ()=>{
-    console.log('Server is Running on port 3000')
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
