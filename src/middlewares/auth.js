@@ -12,7 +12,7 @@
 
 const userAuth = (req,res, next) =>{
     console.log("User auth is getting checekd ");
-    const token  = "xyz";
+    const token  = "xyze";
     const isAdminAUthorized = token === "xyz";
     if (!isAdminAUthorized){
         res.status(401).send("Unauthorized Request");

@@ -15,7 +15,11 @@ app.post("/user/login", (req, res)=>{
     res.send("User Log Sucessfully ")
 })
 
-app.get("./user", userAuth, (req,res)=>{
+app.post("/user/login", (req, res)=>{
+    res.send("User Log Sucessfully ")
+})
+
+app.get("/user", userAuth, (req,res)=>{
     res.send("User Data sent")
 })
 // user route
