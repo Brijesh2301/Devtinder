@@ -52,6 +52,62 @@ app.get("/feed", async(req, res) => {
   }
 });
 
+
+app.delete("/user", async (req, res) => {
+
+  const userId = req.body.userId;
+
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    res.send("User deleted successfully");
+  } catch (error) {
+    console.log("Delete error:", error);
+    res.status(400).send("Something went wrong");
+  }
+});
+
+//Update the data of user 
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  const data = req.body;
+
+  try {
+    const ALLOWED_UPDATES = ["firstName", "lastName", "password"];
+
+    const isUpdateAllowed = Object.keys(data).every((update) =>
+      ALLOWED_UPDATES.includes(update)
+    );
+
+    if (!isUpdateAllowed) {
+      return res.status(400).send("Update not allowed"); // ✅ added return
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      data,
+      {
+        new: true, // simpler alternative to returnDocument: "after"
+        runValidators: true,
+      }
+    );
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(400).send("Update failed: " + error.message);
+  }
+});
+ 
+
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
