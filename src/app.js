@@ -5,6 +5,11 @@ const app = express();
 const User = require("./models/user"); // Import the User model
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+app.use(cookieParser());
+
+
 
 const PORT = 3000;
 
@@ -37,31 +42,73 @@ app.post("/signup", async (req, res) => {
 
 //Login Api - POST / login
 
-app.post("/login", async(req,res)=>{
-  try{
-    const {emailId, password} = req.body;
-    
-    const user = await User.findOne({emailId: emailId});
 
-    if(!user){
-      throw new Errro("EmailId is  not exists")
-    }
 
-    if(!emailId || !password){
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    if (!emailId || !password) {
       return res.status(400).send("Email and Password are required");
     }
+
+    const user = await User.findOne({ emailId });
+    if (!user) {
+      return res.status(404).send("Email ID does not exist");
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if(isPasswordValid){
-      res.send("Login Successful");
+    if (!isPasswordValid) {
+      return res.status(401).send("Password is not valid");
     }
-    else{
-      res.status(401).send("Password is not valid ");
-    }
-  }
-  catch(err){   
-    res.status(500).send("Error:"+ err.message );
+
+    // ✅ Create JWT token
+    const token =  jwt.sign({ userId: user._id }, "mySecretKey", { expiresIn: "1h" });
+
+    // ✅ Send cookie in response
+    res.cookie("token", token, {
+      httpOnly: true,     // can’t be accessed by JS (for security)
+      secure: false,      // change to true if using https
+      sameSite: "lax",    // allows cookie to be used in Postman/local requests
+      path: "/",          // cookie applies to all routes
+    });
+
+    // ✅ Response after cookie is set
+    res.status(200).send("Login Successful ✅");
+
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).send("Error: " + err.message);
   }
 });
+
+app.get("/profile", async (req, res) => {
+
+  const cookies = req.cookies;
+  console.log("Cookies: ", cookies);
+  const token = cookies.token;  
+
+  if(!token){
+    return res.status(401).send("Invalid token");
+  }
+  //validate by token
+
+  const decodedMessage = await jwt.verify(token, "mySecretKey");  
+  console.log("Decoded Message: ", decodedMessage);
+  const{ userId } = decodedMessage;
+  console.log("Logged  Userd is: ", userId);
+
+  const user = await User.findById(userId);
+  if(!user){
+    return res.status(404).send("User not found");
+  }
+
+  res.send(user);
+
+  res.send("Reading Cookie")
+
+})
+
 
 //GET User By Email
 app.get("/user", async (req, res) => {
