@@ -1,28 +1,31 @@
- const adminAuth = (req, res, next) =>{
-    console.log("Admin Auth is getting checked");
-    const token = "xyz";
-    const isAdminAUthorized = token === 'xyz';
-    if(!isAdminAUthorized){
-      res.status(401).send("Unauthorize Request");
-    }
-    else{
-        next()
-    }
-}
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-const userAuth = (req,res, next) =>{
-    console.log("User auth is getting checekd ");
-    const token  = "xyze";
-    const isAdminAUthorized = token === "xyz";
-    if (!isAdminAUthorized){
-        res.status(401).send("Unauthorized Request");
+const userAuth = async (req, res, next) => {
+  try {
+    const { token } = req.cookies;
 
+    if (!token) {
+      return res.status(401).send("No token found");
     }
-    else{
-        next()
-    }
-}
 
-module.exports = {
-    adminAuth,userAuth
-}
+    // Verify the token
+    const decodedObj = jwt.verify(token, "mySecretKey");
+    const { userId } = decodedObj;
+
+    // Find the user in DB
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    // Attach user to request object for next middleware/route
+    req.user = user;
+
+    next(); // ✅ Proceed to next middleware
+  } catch (error) {
+    res.status(401).send("ERROR: " + error.message);
+  }
+};
+
+module.exports = { userAuth };

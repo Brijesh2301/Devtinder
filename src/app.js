@@ -7,6 +7,7 @@ const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth");
 app.use(cookieParser());
 
 
@@ -111,7 +112,7 @@ app.get("/profile", async (req, res) => {
 
 
 //GET User By Email
-app.get("/user", async (req, res) => {
+app.get("/user", userAuth, async (req, res) => {
   const userEmail = req.body.emailId;
 
   try {
