@@ -6,11 +6,11 @@ const userAuth = async (req, res, next) => {
     const { token } = req.cookies;
 
     if (!token) {
-      return res.status(401).send("No token found");
+     throw new Error("Token is not valid");
     }
 
     // Verify the token
-    const decodedObj = jwt.verify(token, "mySecretKey");
+    const decodedObj = await jwt.verify(token, "mySecretKey");
     const { userId } = decodedObj;
 
     // Find the user in DB

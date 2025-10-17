@@ -64,11 +64,12 @@ app.post("/login", async (req, res) => {
     }
 
     // ✅ Create JWT token
-    const token =  jwt.sign({ userId: user._id }, "mySecretKey", { expiresIn: "1h" });
+    const token =  jwt.sign({ userId: user._id }, "mySecretKey", { expiresIn: "7d" });
 
     // ✅ Send cookie in response
     res.cookie("token", token, {
-      httpOnly: true,     // can’t be accessed by JS (for security)
+      httpOnly: true, 
+      expires: new Date(Date.now()+ 8+360000)  ,  // can’t be accessed by JS (for security)
       secure: false,      // change to true if using https
       sameSite: "lax",    // allows cookie to be used in Postman/local requests
       path: "/",          // cookie applies to all routes
@@ -83,30 +84,15 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile",userAuth, async (req, res) => {
 
-  const cookies = req.cookies;
-  console.log("Cookies: ", cookies);
-  const token = cookies.token;  
-
-  if(!token){
-    return res.status(401).send("Invalid token");
-  }
-  //validate by token
-
-  const decodedMessage = await jwt.verify(token, "mySecretKey");  
-  console.log("Decoded Message: ", decodedMessage);
-  const{ userId } = decodedMessage;
-  console.log("Logged  Userd is: ", userId);
-
-  const user = await User.findById(userId);
-  if(!user){
-    return res.status(404).send("User not found");
-  }
-
-  res.send(user);
-
-  res.send("Reading Cookie")
+try{
+  const user = req.user
+ 
+res.send(user);
+}catch(err){
+  res.status(500).send("Error: " + err.message);
+}
 
 })
 
@@ -126,65 +112,74 @@ app.get("/user", userAuth, async (req, res) => {
   }
 });
 
+app.post("/sendConnectionRequest",userAuth,   async (req, res) => {
+  //sending connection request 
+  console.log("sending a connection request")
+  const user = req.user;
+res.send(user.firstName +  "request sent successfully") 
+});
+
+
+
 //Feed Api - GET / Feed  -get all the useres from the database
 
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (error) {
-    res.status(500).send("Something went wrong");
-  }
-});
+// app.get("/feed", async (req, res) => {
+//   try {
+//     const users = await User.find({});
+//     res.send(users);
+//   } catch (error) {
+//     res.status(500).send("Something went wrong");
+//   }
+// });
 
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
+// app.delete("/user", async (req, res) => {
+//   const userId = req.body.userId;
 
-  try {
-    const user = await User.findByIdAndDelete(userId);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    res.send("User deleted successfully");
-  } catch (error) {
-    console.log("Delete error:", error);
-    res.status(400).send("Something went wrong");
-  }
-});
+//   try {
+//     const user = await User.findByIdAndDelete(userId);
+//     if (!user) {
+//       return res.status(404).send("User not found");
+//     }
+//     res.send("User deleted successfully");
+//   } catch (error) {
+//     console.log("Delete error:", error);
+//     res.status(400).send("Something went wrong");
+//   }
+// });
 
-//Update the data of user
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params.userId;
-  const data = req.body;
+// //Update the data of user
+// app.patch("/user/:userId", async (req, res) => {
+//   const userId = req.params.userId;
+//   const data = req.body;
 
-  try {
-    const ALLOWED_UPDATES = ["firstName", "lastName", "password"];
+//   try {
+//     const ALLOWED_UPDATES = ["firstName", "lastName", "password"];
 
-    const isUpdateAllowed = Object.keys(data).every((update) =>
-      ALLOWED_UPDATES.includes(update)
-    );
+//     const isUpdateAllowed = Object.keys(data).every((update) =>
+//       ALLOWED_UPDATES.includes(update)
+//     );
 
-    if (!isUpdateAllowed) {
-      return res.status(400).send("Update not allowed"); // ✅ added return
-    }
+//     if (!isUpdateAllowed) {
+//       return res.status(400).send("Update not allowed"); // ✅ added return
+//     }
 
-    const user = await User.findByIdAndUpdate(userId, data, {
-      new: true, // simpler alternative to returnDocument: "after"
-      runValidators: true,
-    });
+//     const user = await User.findByIdAndUpdate(userId, data, {
+//       new: true, // simpler alternative to returnDocument: "after"
+//       runValidators: true,
+//     });
 
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
+//     if (!user) {
+//       return res.status(404).send("User not found");
+//     }
 
-    res.status(200).json({
-      message: "User updated successfully",
-      user,
-    });
-  } catch (error) {
-    res.status(400).send("Update failed: " + error.message);
-  }
-});
+//     res.status(200).json({
+//       message: "User updated successfully",
+//       user,
+//     });
+//   } catch (error) {
+//     res.status(400).send("Update failed: " + error.message);
+//   }
+// });
 
 connectDB()
   .then(() => {
