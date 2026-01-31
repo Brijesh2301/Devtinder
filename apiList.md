@@ -3,15 +3,16 @@ post/signup
 post/login
 post/profile
 
-
+#profileRouter
 GET/profile/view
 PATCH/profile/edit
 PATCH/profile/password
 
-
+#connnectionRequestRouter
 POST / request /send / interested/ userId:
 POST / request/ send / ignored /: requestId
 
+#userRouter
 POST / request / review /accepted /:requestId
 POST / reequest / review / rejected /: requestID
 
