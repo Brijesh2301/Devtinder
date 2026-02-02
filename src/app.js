@@ -15,17 +15,24 @@ app.use(express.json());
 
 // CORS: allow your frontend origin and credentials (cookies)
 // Must be placed BEFORE your routes
-app.use(cors({
-  origin: FRONTEND_ORIGIN,
-  credentials: true,
-  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type","Authorization","X-Requested-With"]
-}));
+app.use(
+  cors({
+    origin: FRONTEND_ORIGIN,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  }),
+);
 
 // optional: simple logger for CORS preflight debugging
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
-    console.log("Preflight (OPTIONS) for", req.path, "from", req.header("origin"));
+    console.log(
+      "Preflight (OPTIONS) for",
+      req.path,
+      "from",
+      req.header("origin"),
+    );
   }
   next();
 });
@@ -33,10 +40,12 @@ app.use((req, res, next) => {
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
+const userRouter = require("./routes/user");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
+app.use("/", userRouter);
 
 connectDB()
   .then(() => {

@@ -14,7 +14,7 @@ POST / request/ send / ignored /: requestId
 
 #userRouter
 POST / request / review /accepted /:requestId
-POST / reequest / review / rejected /: requestID
+POST / reequest / review / rejected /: requestId
 
 GET / connections
 GET / request / reveived
