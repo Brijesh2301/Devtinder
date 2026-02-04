@@ -49,6 +49,9 @@ const userSchema = new mongoose.Schema(
     address: {
       type: String,
     },
+    skills: {
+      type: [String],
+    },
 
     gender: {
       type: String,
