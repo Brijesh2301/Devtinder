@@ -37,9 +37,9 @@ function validateEditProfileData(req) {
     "age",
     "about",
     "skills",
-    "photo",
+    "photoUrl",
     "phone",
-    "name"
+   
   ];
 
   const incoming = Object.keys(req.body); // <<-- correct: capital O
