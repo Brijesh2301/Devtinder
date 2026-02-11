@@ -12,24 +12,25 @@ const userSchema = new mongoose.Schema(
       minlength: 3,
       maxLength: 50,
       index: true,
+       
     },
     lastName: {
       type: String,
       required: true,
+    
     },
-    age: {
-      type: Number, 
+    age:{
+ type: Number,  // Make sure this exists
+   
     },
     about: {
       type: String,
       default: "Hey there! I am using DevTinder.",
     },
-    photoUrl: {
-      type: String,
-      default:
-        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-    },
-
+    photoUrl:{
+        type:String,
+        default:"https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"},
+        
     emailId: {
       type: String,
       required: true,
@@ -75,7 +76,8 @@ const userSchema = new mongoose.Schema(
 
 // User.find({firstName: "John", lastName: "Doe"})
 
-userSchema.index({ firstName: 1, lastName: 1 });
+userSchema.index({firstName:1, lastName:1})
+ 
 
 userSchema.method.getJWT = async function () {
   const user = this;
