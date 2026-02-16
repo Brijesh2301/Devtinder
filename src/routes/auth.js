@@ -8,15 +8,21 @@ const jwt = require("jsonwebtoken");
 
 authRouter.post("/signup", async (req, res) => {
   try {
-    //validate of the data
+    console.log("📥 Received body:", req.body); // ✅ ADD THIS
+    
+    // Validate the data
     validateSignUpData(req);
+    console.log("✅ Validation passed"); // ✅ ADD THIS
 
-    //Encrypt the password before saving it to the database
     const { firstName, lastName, emailId, password } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
-    console.log(passwordHash);
 
-    // Create a new user instance
+    // Check if user already exists (login ki tarah)
+    const existingUser = await User.findOne({ emailId });
+    if (existingUser) {
+      return res.status(400).send("User already exists with this email");
+    }
+
     const user = new User({
       firstName,
       lastName,
@@ -24,10 +30,28 @@ authRouter.post("/signup", async (req, res) => {
       password: passwordHash,
     });
 
-    await user.save();
-    res.send("Use added successfully");
+    console.log("👤 About to save user"); // ✅ ADD THIS
+    const savedUser = await user.save();
+    console.log("💾 User saved successfully"); // ✅ ADD THIS
+    
+    const token = await savedUser.getJWT();
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 24 * 3600000),
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+    });
+
+    res.json({ 
+      message: "User added successfully", 
+      data: savedUser 
+    });
+    
   } catch (err) {
-    res.status(400).send("Error:" + err.message);
+    console.error("❌ Signup error:", err); // Error details
+    res.status(400).send("Error: " + err.message);
   }
 });
 
