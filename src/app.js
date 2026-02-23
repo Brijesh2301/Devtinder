@@ -8,7 +8,7 @@ const app = express();
 const PORT = 3000;
 
 // FRONTEND ORIGIN — change if your React runs on a different port
-const FRONTEND_ORIGIN = "http://15.206.222.88:5173";
+const FRONTEND_ORIGIN = "http://15.206.222.88";
 
 app.use(cookieParser());
 app.use(express.json());
