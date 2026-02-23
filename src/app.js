@@ -1,24 +1,20 @@
 // server.js
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./config/database");
+const connectDB = require("./config/database"); // Ensure the database is connected
 const cookieParser = require("cookie-parser");
 
 const app = express();
+const PORT = 3000;
 
-// Use environment variable in production
-const PORT = process.env.PORT || 3000;
-
-// IMPORTANT: In production use your real domain
-const FRONTEND_ORIGIN =
-  process.env.NODE_ENV === "production"
-    ? "https://devtinder24.online"
-    : "http://localhost:5173";
+// FRONTEND ORIGIN — change if your React runs on a different port
+const FRONTEND_ORIGIN = "http://15.206.222.88:5173";
 
 app.use(cookieParser());
 app.use(express.json());
 
-// CORS Configuration
+// CORS: allow your frontend origin and credentials (cookies)
+// Must be placed BEFORE your routes
 app.use(
   cors({
     origin: FRONTEND_ORIGIN,
@@ -28,7 +24,7 @@ app.use(
   }),
 );
 
-// Optional preflight logger
+// optional: simple logger for CORS preflight debugging
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
     console.log(
@@ -53,9 +49,9 @@ app.use("/", userRouter);
 
 connectDB()
   .then(() => {
-    // 🔐 IMPORTANT CHANGE HERE
-    app.listen(PORT, "127.0.0.1", () => {
-      console.log(`Server running securely on http://127.0.0.1:${PORT}`);
+    // console.log("Database connected successfully");
+ app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running at http://15.206.222.88:${PORT}`);
     });
   })
   .catch((err) => {
