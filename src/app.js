@@ -1,3 +1,7 @@
+require('dotenv').config();
+
+require('./utils/cronjob');
+
 // server.js
 const express = require("express");
 const cors = require("cors");
@@ -17,7 +21,7 @@ app.use(express.json());
 // Must be placed BEFORE your routes
 app.use(
   cors({
-    origin: FRONTEND_ORIGIN,
+    origin: [FRONTEND_ORIGIN,"http://localhost:5173"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],

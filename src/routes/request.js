@@ -3,7 +3,7 @@ const requestRouter = express.Router();
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequestModel = require("../models/connectionRequest");
 const User = require("../models/user");
-
+const { run: sendEmail } = require("../utils/sendEmail");
 
 requestRouter.post(
   "/request/send/:status/:touserId",
@@ -21,7 +21,6 @@ requestRouter.post(
         });
       }
 
-      // ✅ FIX 1: Check if toUser exists
       const toUser = await User.findById(toUserId);
       if (!toUser) {
         return res.status(404).json({
@@ -29,8 +28,6 @@ requestRouter.post(
         });
       }
 
-      // ✅ FIX 2: Only check for existing request if status is "interested"
-      // "ignored" should be allowed even if connection exists
       if (status === "interested") {
         const existingConnectionRequest = await ConnectionRequestModel.findOne({
           $or: [
@@ -46,16 +43,24 @@ requestRouter.post(
         }
       }
 
-      // ✅ FIX 3: Use the status variable, not hardcoded "interested"
       const connectionRequest = new ConnectionRequestModel({
         fromUserId,
         toUserId,
-        status, // Changed from status: "interested"
+        status,
       });
 
       const data = await connectionRequest.save();
 
-      // ✅ FIX 4: Use toUser.firstName (from fetched user object)
+      // ✅ Email wrapped in try/catch — won't crash if AWS fails
+      if (status === "interested") {
+        try {
+          const sendEmailRes = await sendEmail( "A new Friend Request from " + req.user.firstName, + " is " + status + " in " + toUser.firstName,);
+          console.log("Email sent:", sendEmailRes);
+        } catch (err) {
+          console.log("Email skipped:", err.message);
+        }
+      }
+
       res.json({
         message:
           req.user.firstName + " is " + status + " in " + toUser.firstName,
@@ -65,7 +70,7 @@ requestRouter.post(
       console.error("Connection request error:", err);
       res.status(500).send("Error: " + err.message);
     }
-  },
+  }
 );
 
 requestRouter.post(
@@ -107,7 +112,5 @@ requestRouter.post(
     }
   }
 );
-
-
 
 module.exports = requestRouter;
