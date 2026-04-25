@@ -12,21 +12,41 @@ const app = express();
 const PORT = 3000;
 
 // FRONTEND ORIGIN — change if your React runs on a different port
-const FRONTEND_ORIGIN = "http://15.206.222.88";
+// const FRONTEND_ORIGIN = "http://15.206.222.88";
+const allowedOrigins = [
+  "http://15.206.222.88",
+  "https://your-app-name.vercel.app"
+];
+
 
 app.use(cookieParser());
 app.use(express.json());
 
 // CORS: allow your frontend origin and credentials (cookies)
 // Must be placed BEFORE your routes
-app.use(
-  cors({
-    origin: [FRONTEND_ORIGIN,"http://localhost:5173"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  }),
-);
+// app.use(
+//   cors({
+//     origin: [FRONTEND_ORIGIN,"http://localhost:5173"],
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+//   }),
+// );
+
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+}));
+
 
 // optional: simple logger for CORS preflight debugging
 app.use((req, res, next) => {
