@@ -15,7 +15,7 @@ const PORT = 3000;
 // const FRONTEND_ORIGIN = "http://15.206.222.88";
 const allowedOrigins = [
   "http://15.206.222.88",
-  "https://your-app-name.vercel.app"
+  "https://div-tinder-web.vercel.app/"
 ];
 
 
