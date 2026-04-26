@@ -15,9 +15,9 @@ const PORT = 3000;
 // const FRONTEND_ORIGIN = "http://15.206.222.88";
 const allowedOrigins = [
   "http://15.206.222.88",
-  "https://div-tinder-web.vercel.app/"
+  "https://div-tinder-web.vercel.app",
+  "http://localhost:5174"
 ];
-
 
 app.use(cookieParser());
 app.use(express.json());
@@ -33,7 +33,6 @@ app.use(express.json());
 //   }),
 // );
 
-
 app.use(cors({
   origin: function(origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -43,10 +42,9 @@ app.use(cors({
     }
   },
   credentials: true,
-   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }));
-
 
 // optional: simple logger for CORS preflight debugging
 app.use((req, res, next) => {
@@ -74,8 +72,8 @@ app.use("/", userRouter);
 connectDB()
   .then(() => {
     // console.log("Database connected successfully");
- app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running at http://15.206.222.88:${PORT}`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running at http://15.206.222.88:${PORT}`);
     });
   })
   .catch((err) => {
