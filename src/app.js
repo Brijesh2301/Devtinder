@@ -16,7 +16,7 @@ const PORT = 3000;
 const allowedOrigins = [
   "http://15.206.222.88",
   "https://div-tinder-web.vercel.app",
-  "http://localhost:5174"
+  "http://localhost:5173"
 ];
 
 app.use(cookieParser());
