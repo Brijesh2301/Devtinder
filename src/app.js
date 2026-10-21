@@ -16,7 +16,6 @@ const allowedOrigins = [
   "http://15.206.222.88",
   "https://div-tinder-web.vercel.app",
   "http://localhost:5173"
-  
 ];
 
 app.use(cookieParser());
@@ -64,7 +63,8 @@ connectDB()
   .then(() => {
     // console.log("Database connected successfully");
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running at https://dashboard.render.com/:${PORT}`);
+      console.log(`Server running at :${PORT}`);
+      console.log(`Server running at :${PORT}`);
     });
   })
   .catch((err) => {
