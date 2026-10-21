@@ -63,7 +63,7 @@ connectDB()
   .then(() => {
     // console.log("Database connected successfully");
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running at https://dashboard.render.com:${PORT}`);
+      console.log(`Server running at https://devtinder-d620.onrender.com:${PORT}`);
     });
   })
   .catch((err) => {
